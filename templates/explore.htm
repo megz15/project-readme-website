@@ -1,0 +1,188 @@
+{% extends 'layout.htm' %}
+{% block content %}
+<center>
+<div class="column is-two-thirds">
+<form method="GET" action="">
+    <div class="columns">
+        <div class="column is-full-mobile">
+            <b-field>
+                <b-input name="q" icon="magnify" placeholder="Search books..." expanded value="{{searchquery | replace('+',' ')}}"></b-input>
+                <!-- <b-input name="lt" placeholder="50" value="{{searchlimit}}"></b-input> -->
+                <b-select name="by" v-model="selected" placeholder="By Title">
+                    <option value="title">By Title</option>
+                    <option value="author">By Author</option>
+                </b-select>
+            </b-field>
+        </div>
+        <div class="column is-narrow is-full-mobile">
+            <b-field grouped>
+                <!-- &nbsp;&nbsp;&nbsp;<b-slider name="lt" style="width: 100%;" :min="25" :max="100" :step="25" :value="100" ticks type="is-primary" value={{searchlimit}}></b-slider> -->
+                <b-numberinput name="lt" v-model="results" controls-position="compact" controls-rounded min="25" max="100" step="25" :editable="false" type="is-dark" style="width:140px"></b-numberinput>
+                &nbsp;&nbsp;&nbsp;<button type="submit" class="button is-success">Search</button>
+            </b-field>
+        </div>
+    </div>
+</form>
+<!-- <br><button class="button is-success is-light" onclick="a()">Update Broken Images</button> -->
+</div>
+
+<div class="columns is-multiline m-4 is-centered">
+{% for book in books %}
+    <div class="column is-2 box pl-4 m-3 has-text-centered overlay-container" @click="openBookModal({{book}})" style="display:flex;flex-direction:column;justify-content:space-between;height:425px;">
+        <!-- <img class="overlay-image" src="{{book.img}}" onerror='this.onerror=null;this.src=this.src.replace("-d","-g");'> -->
+        <img class="overlay-image darkmode-ignore" src="{{book.img}}" onerror="loadNextImage(this, 0);">
+        <div class="overlay-content">
+            <p >{{ book.Title | truncate(50) }}</p>
+            <p >By: {{ book.Author | truncate(15) }}</p>
+            <!-- <h1>Publisher: {{ book.Publisher }}</h1>
+            <h1>Year: {{ book.Year }}</h1>
+            <h1>Pages: {{ book.Pages }}</h1>
+            <h1>Lang: {{ book.Language }}</h1> -->
+            <p>{{ book.Size }}, {{ book.Extension }}</p>
+        </div>
+    </div>
+{% endfor %}
+</div>
+</center>
+<div class="box m-6">No more results to display!</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    // var index = 0;
+    // var sources = [
+    //     element.src.replace('-d','-g'),
+    //     element.src.replace('-d','').replace('-g',''),
+    //     element.src.slice(0,element.src.indexOf('/',53))+element.src.slice(element.src.indexOf('/',53)).toUpperCase().replace('.JPG','-g.jpg'),
+    //     element.src = element.src.slice(0,element.src.indexOf('/',52))+'/0'+element.src.slice(element.src.indexOf('/',53)).toLowerCase().replace('-g','-d'),
+    //     element.src = element.src.replace('-d',''),
+    //     '/static/404.png'
+    // ];
+
+    function loadNextImage(element, index) {
+        element.src = element.src.replace('-d','-g');
+        element.onerror = function() {
+            element.src = element.src.replace('-d','').replace('-g','');
+            element.onerror = function() {
+                element.src = element.src.slice(0,element.src.indexOf('/',53))+element.src.slice(element.src.indexOf('/',53)).toUpperCase().replace('.JPG','-g.jpg');
+                element.onerror = function() {             
+                    element.src = element.src.slice(0,element.src.indexOf('/',52))+'/0'+element.src.slice(element.src.indexOf('/',53)).toLowerCase().replace('-g','-d');
+                    element.onerror = function() {
+                        element.src = element.src.replace('-d','');
+                        element.onerror = function() {
+                            element.src = '/static/404.png'
+                        }
+                    }
+                }
+            }
+        };
+    }
+</script>
+<script>
+    app = new Vue({
+      el: '#app',
+      data(){
+          return {
+        isLoginModalActive: false,
+        isRegisterModalActive: false,
+        isBookModalActive: false,
+        results: 50,
+        url: '',
+          }
+      },
+      methods: {
+          openBookModal: function(bookDetails){
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", "/getlinks?link="+bookDetails.Mirror_1, false );
+            xmlHttp.send( null );
+
+            if (bookDetails.Extension=='pdf') {
+                this.url = `/pdf?link=${encodeURI(JSON.parse(xmlHttp.responseText)["IPFS.io"])}`
+            } else if (bookDetails.Extension=='epub'){
+                this.url = `https://www.ofoct.com/viewer/do_convert_old.php?downloadsavename=&tmpfpath=&cid=epub_viewer&output=&quality=low-resolution&frmid=convertfrmurl1&fileurl=${encodeURI(JSON.parse(xmlHttp.responseText).Cloudflare)}`
+            }
+
+            // <iframe frameborder="0" scrolling="no" width="100%" height="100%"
+            // src="${JSON.parse(xmlHttp.responseText).img}" name="imgbox" id="imgbox">
+            // <p>iframes are not supported by your browser.</p>
+            // </iframe>
+
+            this.$buefy.modal.open({
+                    width: 400,
+                    scroll: 'keep',
+                    content: `
+                    <b-modal :active.sync="isBookModalActive" has-modal-card>
+                        <div class="modal-card" style="width: auto;">
+                            <header class="modal-card-head">
+                                    <div class="columns is-multiline">
+                                <div class="column is-full">
+                                    <div class="modal-card-title">${bookDetails.Title}</div>
+                                </div>
+                                <div class="column is-full">
+                                    <div class="is-size-12 m-0 p-0">By ${bookDetails.Author}</div>
+                                    <a href="${bookDetails.Mirror_1}" class="is-size-6 m-0 p-0" target="_blank">Book link</a>
+                                    ,&nbsp;
+                                    <a href="${bookDetails.img}" class="is-size-6 m-0 p-0" target="_blank">Book cover</a>
+                                    ,&nbsp;
+                                    <a href="${bookDetails.Edit}" class="is-size-6 m-0 p-0" target="_blank">Edit book</a>
+                                </div>
+                            </header>
+                                        <section class="modal-card-body">
+                                        <div class="column">
+                                            <table class="table m-0 p-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Size</th>
+                                                        <th><abbr title="Extension">Ext</abbr></th>
+                                                        <th>Publisher</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>${bookDetails.Size}</td>
+                                                        <td>${bookDetails.Extension}</td>
+                                                        <td>${bookDetails.Publisher}</td>
+                                                    </tr>
+                                                </tbody>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Year</th>
+                                                        <th>Pages</th>
+                                                        <th><abbr title="Language">Lang</abbr></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>${bookDetails.Year}</td>
+                                                        <td>${bookDetails.Pages}</td>
+                                                        <td>${bookDetails.Language}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                        </section>
+                        <footer class="modal-card-foot">
+                            <a class="button is-primary" target="_blank" href=${this.url} >Open Book</a>
+                            
+                            <form method="POST" action="/addtolibrary">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <input type="hidden" name="bookDetails" value='${JSON.stringify(bookDetails).replaceAll("'","φquoetφ")}'/>
+                                <button id='addlib' class="button is-warning" onclick="this.parentNode.submit();document.getElementById('addlib').innerHTML='Added!';document.getElementById('addlib').classList.remove('is-warning');document.getElementById('addlib').classList.add('is-success');document.getElementById('addlib').disabled=true;">Add to library</button>
+                            </form>
+                            
+                            <a class="button is-info ml-2" target="_blank" href="${encodeURI(JSON.parse(xmlHttp.responseText)["IPFS.io"])}">Download</a>
+                        </footer>
+                    </div></b-modal>
+                    `
+                })
+          },
+        darken: function() {
+          const darkmode =  new Darkmode();
+          darkmode.toggle();
+        }
+      }
+
+    })
+</script>
+{% endblock %}

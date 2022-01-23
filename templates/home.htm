@@ -1,0 +1,231 @@
+{% extends 'layout.htm' %}
+{% block content %}
+<div class="columns is-mobile">
+  <div class="column ml-5 mt-2 is-narrow is-hidden-mobile">
+    <b-sidebar
+      style="position:sticky;top:25px;overflow:auto;"
+      position="static"
+      fullheight=true
+      mobile="hide"
+      scroll="keep"
+      open>
+        <div class="mt-2 ml-2">
+          <img src="/static/favicon.ico"/>
+        </div>
+        <b-menu>
+          <b-menu-list>
+            <b-menu-item icon="human-greeting" label="Introduction"></b-menu-item>
+            <b-menu-item icon="bullseye-arrow" label="Objective"></b-menu-item>
+            <b-menu-item icon="server" label="System Specs"></b-menu-item>
+            <b-menu-item icon="tune-vertical" label="Technical Details"></b-menu-item>
+          </b-menu-list>
+        </b-menu>
+    </b-sidebar>
+  </div>
+
+  <div class="column">
+    <div class="columns box ml-3 mr-3 mt-2">
+      <div class="column is-align-items-center is-flex">
+        <p>
+          The
+            <b-tag type="is-warning is-light is-medium">Readme</b-tag>
+            <b-tag type="is-success is-light is-medium">Project</b-tag>
+          (or <code style="color:darkslategrey"><i>Project Readme</i></code> ) is a user friendly, intuitive and visually pleasing web application built by
+            <b-tag type="is-warning is-light is-medium">Meghraj</b-tag>
+            <b-tag type="is-success is-light is-medium">Goswami</b-tag>
+          that serves books and other resources from the notable shadow library
+          <code style="color:darkorange"><abbr title="Library Genesis">LibGen</abbr></code> (and by extension <code style="color:darkcyan">Z-Library</code> and <code>Sci-Hub</code>) by utilizing a modified/self-written unofficial API
+          to the service, which by itself provides a minimal and not fully featured API for integration,
+          most if not all of it is documented in Russian.
+        </p>
+      </div>
+      <div class="column is-narrow is-align-items-center is-justify-content-center is-flex">
+        <img src="/static/home_book_lover.png" width=300></img>
+      </div>
+    </div>
+
+    <div class="columns is-multiline box ml-3 mr-3 mt-2">
+      <div class="column is-full">
+        <b-steps
+          animated=true
+          rounded=true
+          label-position="bottom"
+          mobile-mode="minimalist">
+          <b-step-item icon="puzzle" label="Intuitive" clickable=true>
+            <h1 class="title is-4 has-text-centered"><br>Responsive design, extremely simple and pleasant to use!</h1>            
+          </b-step-item>
+
+          <b-step-item icon="package-variant" label="Extensive" clickable=true>
+            <h1 class="title is-4 has-text-centered"><br>One of the largest online libraries in the world!</h1>            
+          </b-step-item>
+
+          <b-step-item icon="auto-fix" label="Adaptable" clickable=true>
+            <h1 class="title is-4 has-text-centered"><br>Creation of User Profiles allow users to save books in their own Library!</h1>
+          </b-step-item>
+
+          <b-step-item icon="account-group" label="Social" clickable=true>
+            <h1 class="title is-4 has-text-centered"><br>Availability of Community tab to share your experience with the world!</h1>
+          </b-step-item>
+
+          <template
+                #navigation="{previous, next}">
+                <br><center>
+                <b-button
+                    outlined
+                    type="is-danger"
+                    icon-left="chevron-left"
+                    :disabled="previous.disabled"
+                    @click.prevent="previous.action">
+                    Previous
+                </b-button>
+                <b-button
+                    outlined
+                    type="is-success"
+                    icon-right="chevron-right"
+                    :disabled="next.disabled"
+                    @click.prevent="next.action">
+                    Next
+                </b-button></center><br>
+            </template>
+        </b-steps>
+      </div>
+      <div class="column is-narrow is-align-items-center is-justify-content-center is-flex">
+        <img src="/static/book_hang.png" width=300></img>
+      </div>
+      <div class="column is-align-items-center is-flex">
+        <div>
+          <p class="title is-4">Objective</p>
+          <p>The primary aim of this project is to create an <strong><em>easily accessible</strong></em> and <strong><em>easily comprehensible</strong></em> web application that allows users to access information in the form of published work, research papers and unattainable documents, and also fiction and non-fiction works that people read for recreation or leisure, all packed in a beautifully crafted modern user interface.</p>
+          <p>This project helps people who may be financially incapable of buying printed resources and those who reside in areas where particular books are not circulated.</p>
+        </div>
+      </div>
+      <div class="column is-full"><p>The users don’t need to have top-of-the-line workstations, simple low-end devices that can connect to the internet once in a while and that have support for current web browsers and standards can open the website and use the service. Resources can be downloaded for offline use. The website is fully responsive with support for varying screen sizes, including mobile and laptop screen sizes.
+        <br>A cross platoform application is also being developed using Flutter for Android, Linux and Windows, with features like local storage and caching.
+      </p></div>
+    </div>
+
+    <div class="box ml-3 mr-3 mt-2">
+      <p class="title is-4 is-spaced">Hardware and Software Specifications</p>
+      <b-tabs type="is-boxed">
+        <b-tab-item>
+            <template #header>
+                <b-icon icon="cpu-64-bit"></b-icon>
+                <span> Hardware <b-tag rounded> 3 </b-tag> </span>
+            </template>
+            <div>
+              <div class="columns">
+                <div class="column">
+                  <p class="subtitle is-5">Processor</p>
+                  <pre class="terminal"><span class="shell">&gt; </span><span class="cmd">lscpu</span>
+Architecture:  x86_64
+CPU(s):        20
+Model name:    Intel Xeon CPU E5-2630 v4 @ 2.20GHz
+Max CPU Freq:  3.10 GHz
+Cache:         25 MB</pre>
+                </div>
+                <div class="column is-narrow is-hidden-mobile">
+                  <img width="300px" src="/static/cpu.png">
+                </div>
+              </div>
+              <br>
+              <div class="columns">
+                <div class="column is-narrow is-hidden-mobile">
+                  <img width="300px" src="/static/disk.png">
+                </div>
+                <div class="column">
+                  <p class="subtitle is-5">Disk Space</p>
+                  <pre class="terminal"><span class="shell">&gt; </span><span class="cmd">lsblk</span>
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0  15.9G  0 disk
+└─sda1   8:1    0  15.9G  0 part /home/readme_meghraj</pre>
+                </div>
+              </div>
+              <br>
+              <div class="columns">
+                <div class="column">
+                  <p class="subtitle is-5">RAM</p>
+                  <pre class="terminal"><span class="shell">&gt; </span><span class="cmd">free -h</span>
+      total   used   free
+Mem:    4Gi  0.6Gi  3.3Gi</pre>
+                </div>
+                <div class="column is-narrow is-hidden-mobile">
+                  <img width="300px" src="/static/ram.png">
+                </div>
+              </div>
+              <br>
+              <div class="columns">
+                <div class="column is-narrow is-hidden-mobile">
+                  <img width="300px" src="/static/loc.png">
+                </div>
+                <div class="column">
+                  <p class="subtitle is-5">Server Location</p>
+                  <pre class="terminal"><span class="shell">&gt; </span><span class="cmd">curl https://ipinfo.io/README_IP</span>
+{
+  "city": "Düsseldorf",
+  "region": "North Rhine-Westphalia",
+  "country": "DE",
+  "org": "AS51167 Contabo GmbH",
+  "timezone": "Europe/Berlin",
+}</pre>
+                </div>
+              </div>
+            </div>
+        </b-tab-item>
+        <b-tab-item>
+          <template #header>
+              <b-icon icon="monitor-cellphone"></b-icon>
+              <span> Software <b-tag rounded> 3 </b-tag> </span>
+          </template>
+          <p class="subtitle is-5">Front End</p>
+          <img src="/static/buefy.png" width="500px">
+          <p class="subtitle is-5">Back End</p>
+          This project is built on Python 3 using the Flask web framework.
+          <br>It stores data in an SQLite3 database.
+          <br>The whole thing is containerized with Docker and shipped and deployed to
+          a third party host running on Debian 11 Bullseye.
+          <br><img src="/static/py.png" width="180px">
+          <img src="/static/sql.png" width="180px">
+          <img src="/static/flask.png" width="180px">
+          <img src="/static/debian.png" width="180px">
+          <img src="/static/docker.png" width="180px">
+      </b-tab-item>
+      </b-tabs>
+    </div>
+
+    <div class='box ml-3 mr-3 mt-2'>
+      <p class="title is-3">⚠️ This site is still not production ready!!! ⚠️</p>
+      <b-progress style="width: 75%;"></b-progress>
+      <p class="subtitle is-5">Styling and UI: </p>   <b-progress format="percent" size="is-medium" :rounded="false" type="is-success" value="90" show-value></b-progress>
+      <p class="subtitle is-5">Code Optimization: </p><b-progress format="percent" size="is-medium" :rounded="false" type="is-info" value="70" show-value></b-progress>
+      <p class="subtitle is-5">Error handling: </p>   <b-progress format="percent" size="is-medium" :rounded="false" type="is-warning" value="55" show-value></b-progress>
+      <p class="subtitle is-5">About me section: </p> <b-progress format="percent" size="is-medium" :rounded="false" type="is-danger" value="2" show-value></b-progress>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{%block script %}
+<script>
+    app = new Vue({
+      el: '#app',
+      data:{
+        isLoginModalActive: false,
+        isRegisterModalActive: false,
+      },
+      methods: {
+        snackbar: function(msg,cat) {
+          this.$buefy.snackbar.open({
+            duration: 15000,
+            message: msg,
+            type: cat
+          })
+        },
+        darken: function() {
+          const darkmode =  new Darkmode();
+          darkmode.toggle();
+        }
+      },
+    })
+  </script>
+{% endblock %}

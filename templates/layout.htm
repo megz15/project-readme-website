@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
+	<title>ReadMe - {{title}}</title>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename = '../static/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename = '../static/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename = '../static/favicon-16x16.png') }}">
+  <link rel="manifest" href="{{ url_for('static', filename = '../static/site.webmanifest') }}">
+
+	<script src="https://unpkg.com/vue"></script>
+	<script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.8.55/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+  <script>
+    function addDarkmodeWidget() {
+        const darkmode = new Darkmode({label: '🌓', autoMatchOsTheme: false});
+        darkmode.showWidget();
+    }
+    window.addEventListener('load', addDarkmodeWidget);
+  </script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+    new Crate({
+      server: '859008235902074881', // ReadMe Community
+      channel: '859008236333694976' // #site-widget
+    })
+  </script> -->
+  <!-- <script>
+    document.querySelector("img").addEventListener("error",function(){
+      var fallbackIndex = 0;
+      var fallbacks = ['-g',''];
+      
+      if(fallbackIndex > fallbacks.length-1) return;
+      this.src = this.src.replace('-d',fallbacks[fallbackIndex]);
+      fallbackIndex++;
+    });
+  </script> -->
+</head>
+
+<body style="font-family:Poppins;line-height:2;">
+<div id="app">
+  <section class="hero is-{{height}}height hero-image">
+    <div class="hero-head">
+      <div class="is-pulled-right m-5">
+        <template>
+          <div class="buttons" v-if={{session['user']}}>
+            <b-button @click="isLoginModalActive = true" rounded class="mt-2" type="is-light" style="width:100px;">
+              <strong>Log In</strong>
+            </b-button>
+            <b-button @click="isRegisterModalActive = true" rounded class="mt-2" type="has-text-light has-background-dark" style="width:100px;">
+              <strong>Sign Up</strong>
+            </b-button>
+          </div>
+          <div v-else>
+            <b-button rounded type="is-light" style="width:100px;" class="mt-2" tag="a" href="/logout">
+              <strong>Log Out</strong>
+            </b-button>
+            <figure class="image is-64x64 ml-4" style="display: inline-block">
+              <a href="/profile"><img class="is-rounded" src="{{session['pfp']}}"></a>
+            </figure>
+            <!-- <b-switch :value="false" @input="darken()" type="is-dark" passive-type='is-warning' size="is-large"></b-switch> -->
+          </div>
+        </template>
+      </div>
+    </div>
+    <div class="hero-body">
+      <a class="container has-text-centered" href="{{url_for('home')}}">
+        <p class="title is-1 is-size-3-mobile has-text-danger-light">ReadMe</p>
+        <p class="subtitle is-3 is-size-5-mobile has-text-grey-lighter">Your personal online<br>book library</p>
+        <p class="subtitle is-4 is-size-6-mobile has-text-grey-light">(A school project by<br>Meghraj Goswami, XII-A)</p>
+      </a>
+    </div>
+  </section>
+
+  <div class="tabs is-centered is-medium is-boxed">
+    <ul>
+      <li><a href="{{url_for('home')}}">Home</a></li>
+      <li><a href="{{url_for('library')}}">Library</a></li>
+      <li><a href="{{url_for('explore')}}">Explore</a></li>
+      <li><a href="{{url_for('community')}}">Community</a></li>
+      <li><a href="{{url_for('profile')}}">Profile</a></li>
+    </ul>
+  </div>
+  
+  {% block content%}{% endblock %}
+
+  <template>
+    <b-modal :active.sync="isLoginModalActive" has-modal-card>
+      <form method="POST" action="/">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <div class="modal-card" style="width: auto">
+          <header class="modal-card-head">
+              <p class="modal-card-title">Login</p>
+          </header>
+          <section class="modal-card-body">
+              <b-field label="Username">
+                  <b-input
+                      type="text"
+                      placeholder="Your username"
+                      minlength="4"
+                      maxlength="20"
+                      pattern='[a-zA-Z0-9]*'
+                      validation-message="Username should be atleast 4 chars long with no special char"
+                      required
+                      name="login_uName">
+                  </b-input>
+              </b-field>
+              <b-field label="Password">
+                  <b-input
+                      type="password"
+                      password-reveal
+                      placeholder="Your ********"
+                      minlength="8"
+                      validation-message="Password should be atleast 8 chars long"
+                      required
+                      name="login_pwd">
+                  </b-input>
+              </b-field>
+              <b-field><b-checkbox name="remember">Remember me</b-checkbox></b-field>
+              <b-field><a href="#" class="has-text-success">Forgot Password?</a></b-field>
+          </section>
+          <footer class="modal-card-foot">
+            <b-button
+              label="Close"
+              @click="isLoginModalActive = false"></b-button>
+            <button type="submit" class="button is-success">Login</button>
+        </footer>
+      </div>
+      </form>
+    </b-modal>
+  </template>
+
+  <template>
+    <b-modal :active.sync="isRegisterModalActive" has-modal-card>
+      <form method="POST" action="/">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <div class="modal-card" style="width: auto">
+          <header class="modal-card-head">
+              <p class="modal-card-title">Register</p>
+          </header>
+          <section class="modal-card-body">
+            <b-field grouped>
+              <b-field label="First Name">
+                <b-input
+                    type="text"
+                    placeholder="Meghraj"
+                    minlength="2"
+                    maxlength="20"
+                    validation-message="Name should be atleast 2 chars long"
+                    required
+                    name="fname">
+                </b-input>
+              </b-field>
+              <b-field label="Last Name">
+                <b-input
+                    type="text"
+                    placeholder="Goswami"
+                    minlength="2"
+                    maxlength="20"
+                    validation-message="Surname should be atleast 2 chars long"
+                    name="lname">
+                </b-input>
+              </b-field>
+            </b-field>
+            <b-field label="Username">
+              <b-input
+                  type="text"
+                  placeholder="megz3152"
+                  minlength="4"
+                  maxlength="20"
+                  pattern='[a-zA-Z0-9]*'
+                  validation-message="Username should be atleast 4 chars long with no special char"
+                  required
+                  name="uname">
+              </b-input>
+            </b-field>
+            <b-field label="Password">
+              <b-input
+                  type="password"
+                  password-reveal
+                  placeholder="Your ********"
+                  minlength="8"
+                  validation-message="Password should be atleast 8 chars long"
+                  required
+                  name="pwd">
+              </b-input>
+            </b-field>
+            Already have an account? <a href="#" class="has-text-success" @click="isRegisterModalActive=false; isLoginModalActive=true">Login instead</a>
+          </section>
+          <footer class="modal-card-foot">
+            <b-button
+                label="Close"
+                @click="isRegisterModalActive = false"></b-button>
+            <button type="submit" class="button is-success">Sign Up</button>
+        </footer>
+      </div>
+      </form>
+    </b-modal>
+  </template>
+
+    <footer class="footer pb-2">
+        <div class="has-text-centered">
+            <strong>ReadMe</strong>, a school project made with 🖤 & ☕ by <a href="https://github.com/megz15/">Meghraj Goswami</a>.<br>
+            Technologies used:-<br>
+            Frontend: <a href="https://buefy.org/" target="_blank">Buefy</a> (<a href="https://bulma.io" target="_blank">Bulma</a> + <a href="https://vuejs.org" target="_blank">VueJS</a>)<br>
+            Backend: <a href="https://www.python.org" target="_blank">Python3</a> (<a href="https://flask.palletsprojects.com/" target="_blank">Flask</a>), <a href="https://www.sqlite.org" target="_blank">SQLite</a><br><br>
+            <!-- <a href="https://www.youtube.com/watch?v=oHg5SJYRHA0" target="_blank">Ⓚ 2021 All rights rEVERSED.</a> -->
+        </div>
+    </footer>
+</div>
+
+  {% block script %}{% endblock %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+      <script>app.snackbar("{{message}}","{{category}}")</script>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+</body>
+
+<style type="text/css">
+
+p { margin-bottom: 1em; }
+p:last-child { margin-bottom: 0em; }
+
+/* hero image */
+.hero-image{
+  isolation: isolate;
+  background: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url("/static/hero.jpg");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-color: #999;
+}
+
+/* custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d6dee1;
+  border-radius: 20px;
+  border: 0px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #a8bbbf;
+}
+
+.overlay-container {
+  position: relative;
+  max-width: 300px;
+  min-width: 300px;
+}
+
+.overlay-image {
+  display: block;
+  width: 100%;
+  height: 400px;
+}
+
+.overlay-content {
+  position: absolute;
+  left: 0;
+  bottom: 0; 
+  background: rgb(0, 0, 0);
+  background: rgba(0, 0, 0, 0.8); /* Black see-through */
+  color: #f1f1f1; 
+  width: 100%;
+  transition: .5s ease;
+  opacity:0;
+  color: white;
+  font-size: 20px;
+  padding: 20px;
+  text-align: center;
+}
+
+.overlay-container:hover .overlay-content {
+  opacity: 1;
+}
+
+.darkmode-toggle {
+  z-index: 500;
+}
+</style>
+
+</html>

@@ -1,0 +1,115 @@
+{% extends 'layout.htm' %}
+{% block content %}
+<center>
+<div class="columns is-centered">
+  <div class="column is-narrow is-4 is-10-mobile">
+    <b-message title="Notice❕" type="is-info">
+        After changing the account details, you'll need to logout and login again to view the changes!<br>(will update the code to update session cookie after account updation later 👍)
+    </b-message>
+  </div>
+</div>
+<div class="column is-half is-centered mb-6">
+    <div class="columns is-centered is-vcentered">
+        <div class="column is-one-quarter">
+        	<figure class="image is-128x128"><img class="is-rounded" src={{session['pfp']}}></figure>
+        </div>
+        <div class="column is-one-quarter">
+        	<p class="title is-4">Hello there, {{session['fname']}}!</p>
+        </div>
+    </div>
+    <form method="POST" action="/profile">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <div class="card">
+          <header class="card-header">
+              <p class="card-header-title">Update account details</p>
+          </header>
+          <section class="card-content">
+              <b-field label="Username">
+                  <b-input
+                      type="text"
+                      value={{session['user']}}
+                      minlength="4"
+                      maxlength="20"
+                      pattern='[a-zA-Z0-9]*'
+                      validation-message="Username should be atleast 4 chars long with no special char"
+                      required
+                      name="update_uname">
+                  </b-input>
+              </b-field>
+              <b-field label="Profile Pic URL">
+                <b-input
+                    type="url"
+                    placeholder={{session['pfp']}}
+                    name="update_pic">
+                </b-input>
+              </b-field>
+              <b-field label="First Name">
+                <b-input
+                    type="text"
+                    value={{session['fname']}}
+                    minlength="2"
+                    validation-message="Name should be atleast 2 chars long"
+                    required
+                    name="update_fname">
+                </b-input>
+              </b-field>
+              <b-field label="Last Name">
+                <b-input
+                    type="text"
+                    value={{session['lname']}}
+                    minlength="2"
+                    validation-message="Surname should be atleast 2 chars long"
+                    required
+                    name="update_lname">
+                </b-input>
+              </b-field>
+              <b-field label="Confirm Password">
+                  <b-input
+                      type="password"
+                      password-reveal
+                      placeholder="Your ********"
+                      minlength="8"
+                      validation-message="Password should be atleast 8 chars long"
+                      required
+                      name="confirm_pwd">
+                  </b-input>
+              </b-field>
+          </section>
+          <footer class="card-footer">
+            <button type="submit" onclick="return confirm('Are you sure you want to update account details?')" class="button is-success card-footer-item m-2">Update Account!</button>
+            <button type="submit" formaction="/deleteacc" onclick="return confirm('Are you sure you want to delete your account? This is an irreversible action, and your library content will be lost.')" class="button is-danger card-footer-item m-2">Delete Account!</button>
+        </footer>
+      </div>
+      </form>
+    <!-- <p class='title'>Username: {{session['user']}}<br>
+    Name: {{session['fname']}} {{session['lname']}}<br>
+    Email: {{session['email']}}<br>
+    Join Date: {{session['joindate']}}</p> -->
+</div>
+</center>
+{% endblock %}
+
+{%block script %}
+<script>
+    app = new Vue({
+      el: '#app',
+      data:{
+        isLoginModalActive: false,
+        isRegisterModalActive: false,
+      },
+      methods: {
+        snackbar: function(msg,cat) {
+          this.$buefy.snackbar.open({
+            duration: 15000,
+            message: msg,
+            type: cat
+          })
+        },
+        darken: function() {
+          const darkmode =  new Darkmode();
+          darkmode.toggle();
+        }
+      },
+    })
+  </script>
+{% endblock %}

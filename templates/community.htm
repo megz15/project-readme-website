@@ -1,0 +1,110 @@
+{% extends 'layout.htm' %}
+
+{% block content %}
+<div class="box has-background-white-bis ml-6 mr-6">
+{% for message in messages %}
+<div class="columns is-vcentered is-mobile">
+    {% if messages.index(message)%2==0 %}
+        <div class="column is-align-items-center is-flex">
+            <b-tooltip label={{message['UID'][0]}} type="is-info" position="is-top">
+                <figure class="image is-64x64"><img class="is-rounded" src={{message['UID'][1]}}></figure>
+            </b-tooltip>&nbsp;&nbsp;
+            {% if message['UID'][0]==session['user'] %}
+                <b-tooltip
+                    :triggers="['click']"
+                    :auto-close="['outside', 'escape']"
+                    type="is-dark">
+                    <template v-slot:content>
+                        <form method="POST" action="/deletepost">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="deltime" value="{{message['timestamp']}}"/>
+                            <b-icon icon="delete" type="is-danger" onclick="this.parentNode.submit();"></b-icon>
+                        </form>
+                    </template>
+            {% endif %}
+                <b-message type="is-info" style="word-break: break-all;">
+                    {{message['Msg']}}
+                    <span style="float:right; color: darkslategray;">
+                        <br><i>Sent on: {{message['timestamp']}}</i>
+                    </span>
+                </b-message>
+            </b-tooltip>
+        </div>
+    {% else %}
+        <div class="column is-align-items-center is-flex is-justify-content-end">
+            {% if message['UID'][0]==session['user'] %}
+                <b-tooltip
+                    :triggers="['click']"
+                    :auto-close="['outside', 'escape']"
+                    type="is-dark">
+                    <template v-slot:content>
+                        <form method="POST" action="/deletepost">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="deltime" value="{{message['timestamp']}}"/>
+                            <b-icon icon="delete" type="is-danger" onclick="this.parentNode.submit();"></b-icon>
+                        </form>
+                    </template>
+            {% endif %}
+                <b-message type="is-danger" style="word-break: break-all;">
+                    {{message['Msg']}}
+                    <span style="float:right; color: darkslategray;">
+                        <br><i>Sent on: {{message['timestamp']}}</i>
+                    </span>
+                </b-message>
+            </b-tooltip>&nbsp;&nbsp;
+            <b-tooltip label={{message['UID'][0]}} type="is-danger" position="is-top">
+                <figure class="image is-64x64"><img class="is-rounded" src={{message['UID'][1]}}></figure>
+            </b-tooltip>
+        </div>
+    {% endif %}
+</div>
+{% endfor %}
+</div>
+
+<form method="POST" action="/community">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="columns is-centered is-vcentered is-mobile">
+        <div class="column is-6">
+            <b-field label="Your Message">
+                <b-input
+                    name="post_msg"
+                    placeholder="Keep it respectful! Unruly behavior => account termination 😳"
+                    minlength="10"
+                    maxlength="100"
+                    type="textarea"
+                    required
+                    rounded>
+                </b-input>
+            </b-field>
+        </div>
+        <div class="column is-narrow">
+            <button type="submit" onclick="return confirm('Are you sure you want to post this message? It can be deleted later.')" class="button is-success m-2">Post Message!</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block script %}
+<script>
+app = new Vue({
+    el: '#app',
+    data:{
+    isLoginModalActive: false,
+    isRegisterModalActive: false,
+    },
+    methods: {
+    snackbar: function(msg,cat) {
+        this.$buefy.snackbar.open({
+        duration: 15000,
+        message: msg,
+        type: cat
+        })
+    },
+    darken: function() {
+        const darkmode =  new Darkmode();
+        darkmode.toggle();
+    }
+    },
+})
+</script>
+{% endblock %}

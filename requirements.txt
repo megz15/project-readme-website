@@ -1,0 +1,6 @@
+flask
+flask_wtf
+requests
+bs4
+lxml
+dhooks

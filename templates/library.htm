@@ -1,0 +1,137 @@
+{% extends 'layout.htm' %}
+{% block content %}
+
+<center>
+<div class="columns is-multiline m-4 is-centered">
+{% for book in books %}
+    <div class="column is-2 box pl-4 m-3 has-text-centered overlay-container" @click="openBookModal({{book}})" style="display:flex;flex-direction:column;justify-content:space-between;height:425px;">
+        <!-- <img class="overlay-image" src="{{book.img}}" onerror='this.onerror=null;this.src=this.src.replace("-d","-g");'> -->
+        <img class="overlay-image darkmode-ignore" src="{{book.img}}" onerror="loadNextImage(this, 0);">
+        <div class="overlay-content">
+            <p >{{ book.Title | truncate(50) }}</p>
+            <p >By: {{ book.Author | truncate(15) }}</p>
+            <!-- <h1>Publisher: {{ book.Publisher }}</h1>
+            <h1>Year: {{ book.Year }}</h1>
+            <h1>Pages: {{ book.Pages }}</h1>
+            <h1>Lang: {{ book.Language }}</h1> -->
+            <p>{{ book.Size }}, {{ book.Extension }}</p>
+        </div>
+    </div>
+{% endfor %}
+</div>
+</center>
+
+<div class="box m-6">No more books in your library! <a target="_blank" href="{{url_for('explore')}}">Go add some.</a></div>
+{% endblock %}
+
+{% block script %}
+<script>
+    app = new Vue({
+      el: '#app',
+      data(){
+          return {
+        isLoginModalActive: false,
+        isRegisterModalActive: false,
+        isBookModalActive: false,
+        url: '',
+          }
+      },
+      methods: {
+          openBookModal: function(bookDetails){
+            //console.log(bookDetails);
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", "/getlinks?link="+bookDetails.Mirror_1, false );
+            xmlHttp.send( null );
+
+            if (bookDetails.Extension=='pdf') {
+                this.url = `/pdf?link=${encodeURI(JSON.parse(xmlHttp.responseText).Cloudflare)}`
+            } else if (bookDetails.Extension=='epub'){
+                this.url = `https://www.ofoct.com/viewer/do_convert_old.php?cid=epub_viewer&quality=low-resolution&fileurl=${encodeURI(JSON.parse(xmlHttp.responseText).Cloudflare)}`
+            }
+
+            this.$buefy.modal.open({
+                    width: 400,
+                    scroll: 'keep',
+                    content: `
+                    <b-modal :active.sync="isBookModalActive" has-modal-card>
+                        <div class="modal-card" style="width: auto;">
+                            <header class="modal-card-head">
+                                    <div class="columns is-multiline">
+                                <div class="column is-full">
+                                    <div class="modal-card-title">${bookDetails.Title}</div>
+                                </div>
+                                <div class="column is-full">
+                                    <div class="is-size-12 m-0 p-0">By ${bookDetails.Author}</div>
+                                    <a href="${bookDetails.Mirror_1}" class="is-size-6 m-0 p-0" target="_blank">Book link</a>
+                                    ,&nbsp;
+                                    <a href="${bookDetails.img}" class="is-size-6 m-0 p-0" target="_blank">Book cover</a>
+                                    ,&nbsp;
+                                    <a href="${bookDetails.Edit}" class="is-size-6 m-0 p-0" target="_blank">Edit book</a>
+                                </div>
+                            </header>
+                                <section class="modal-card-body">
+                                <div class="column">
+                                    <table class="table m-0 p-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Size</th>
+                                                <th><abbr title="Extension">Ext</abbr></th>
+                                                <th>Publisher</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>${bookDetails.Size}</td>
+                                                <td>${bookDetails.Extension}</td>
+                                                <td>${bookDetails.Publisher}</td>
+                                            </tr>
+                                        </tbody>
+                                        <thead>
+                                            <tr>
+                                                <th>Year</th>
+                                                <th>Pages</th>
+                                                <th><abbr title="Language">Lang</abbr></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>${bookDetails.Year}</td>
+                                                <td>${bookDetails.Pages}</td>
+                                                <td>${bookDetails.Language}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </section>
+                    <footer class="modal-card-foot">                        
+                        <form method="POST" action="/removefromlibrary">
+                            <div class="columns is-multiline is-centered">
+                                <div class="column is-narrow has-text-centered">
+                                    <a class="button is-primary" target="_blank" href=${this.url} >Open Book</a>
+
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <input type="hidden" name="bookDetails" value='${JSON.stringify(bookDetails).replaceAll("'","φquoetφ")}'/>
+                                    <button id='remlib' class="button is-warning" onclick="this.parentNode.submit();document.getElementById('remlib').innerHTML='Removed!';document.getElementById('remlib').classList.remove('is-warning');document.getElementById('remlib').classList.add('is-success');document.getElementById('remlib').disabled=true;">Remove from library</button>
+                                </div>
+                                <div class="column is-narrow has-text-centered">
+                                    <a class="button is-info" target="_blank" href="${encodeURI(JSON.parse(xmlHttp.responseText)["IPFS.io"])}">Download</a>
+                                    <a class="button is-info" target="_blank" href="${encodeURI(JSON.parse(xmlHttp.responseText).Cloudflare)}">Mirror</a>
+                                    <a class="button is-info" target="_blank" href="${encodeURI(JSON.parse(xmlHttp.responseText).GET)}">Mirror 2</a>
+                                </div>
+                            </div>
+                        </form>
+                    </footer>
+                </div></b-modal>
+                `
+            })
+        },
+        darken: function() {
+          const darkmode =  new Darkmode();
+          darkmode.toggle();
+        }
+      }
+
+    })
+</script>
+{% endblock %}
