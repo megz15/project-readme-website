@@ -426,7 +426,6 @@ def getlinks():
 if __name__ == '__main__':
 	app.run(
 	host='0.0.0.0',
-    #host = '65.108.6.211',
 	debug=True,
-	port=6537
+	#port=6537
     )
