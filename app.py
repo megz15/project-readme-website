@@ -55,8 +55,8 @@ with sql.connect('database/info.db') as conn:
 
 app = Flask(__name__)
 
-#region passwords and stuff
-app.config['SECRET_KEY'] = '1c59962cb1beac57dcaab77f9f2f7d46'
+#region passwords and stuff for vscode
+app.config['SECRET_KEY'] = 'enter_your_secret_key_here' # i removed it due to security reasons
 csrf = CSRFProtect()
 csrf.init_app(app)
 #endregion
